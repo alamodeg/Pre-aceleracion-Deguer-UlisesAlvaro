@@ -14,7 +14,7 @@ namespace Alkemy_Challenge.Controllers
     public class MovieController : ControllerBase
     {
         private readonly DisneyContext _context;
-        
+
         public MovieController(DisneyContext context)
         {
             _context = context;
@@ -34,7 +34,40 @@ namespace Alkemy_Challenge.Controllers
             return Ok(_context.Movies.ToList());
         }
 
-        //TO DO: ELIMINAR
-        //TO DO: MODIFICAR
+        [HttpPut]
+        public IActionResult Put(Movie movie)
+        {
+            if (_context.Movies.FirstOrDefault(mov => mov.Id == movie.Id) == null)
+            {
+                return BadRequest("La pelicula buscada no existe");
+            }
+            else
+            {
+                var internalMovie = _context.Movies.Find(movie.Id);
+
+                internalMovie.Title = movie.Title;
+                internalMovie.Genre = movie.Genre;
+                internalMovie.Rating = movie.Rating;
+                _context.SaveChanges();
+                return Ok(_context.Movies.ToList());
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(int id)
+        {
+            if (_context.Movies.FirstOrDefault(mov => mov.Id == id) == null)
+            {
+                return BadRequest("La pelicula buscada no existe");
+            }
+            else 
+            {
+                var internalMovie = _context.Movies.Find(id);
+                _context.Movies.Remove(internalMovie);
+                _context.SaveChanges();
+                return Ok(_context.Movies.ToList());
+            }
+        }
     }
 }

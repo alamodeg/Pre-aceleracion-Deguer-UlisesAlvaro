@@ -4,14 +4,16 @@ using Alkemy_Challenge.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Alkemy_Challenge.Migrations
 {
     [DbContext(typeof(DisneyContext))]
-    partial class DisneyContextModelSnapshot : ModelSnapshot
+    [Migration("20211029035645_Third")]
+    partial class Third
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
