@@ -13,7 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Alkemy_Challenge.Repositories;
-using Alkemy_Challenge.Interface;
+using Alkemy_Challenge.Interfaces;
+using Newtonsoft.Json;
 
 namespace Alkemy_Challenge
 {
@@ -30,7 +31,7 @@ namespace Alkemy_Challenge
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Alkemy_Challenge", Version = "v1" });

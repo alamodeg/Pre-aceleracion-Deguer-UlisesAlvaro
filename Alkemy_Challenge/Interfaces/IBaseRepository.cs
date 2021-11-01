@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alkemy_Challenge.Interface
+namespace Alkemy_Challenge.Interfaces
 {
     public interface IBaseRepository<TEntity> where TEntity : class
     {

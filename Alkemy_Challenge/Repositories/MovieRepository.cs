@@ -1,6 +1,7 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
-using Alkemy_Challenge.Interface;
+using Alkemy_Challenge.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,12 @@ namespace Alkemy_Challenge.Repositories
 
         public Movie GetMovie(int id)
         {
-            return GetEntity(id);
+            return DbSet.Include(x => x.Characters).FirstOrDefault(x => x.Id == id);
+        }
+
+        public List<Movie> GetMovies()
+        {
+            return DbSet.Include(x => x.Characters).ToList();
         }
     }
 }

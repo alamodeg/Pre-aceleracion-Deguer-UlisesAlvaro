@@ -1,11 +1,13 @@
 ﻿using Alkemy_Challenge.Entities;
 using System.Collections.Generic;
 
-namespace Alkemy_Challenge.Interface
+namespace Alkemy_Challenge.Interfaces
 {
     public interface IMovieRepository
     {
-        Movie GetMovie(int id);
+        Movie GetMovie(int id); //si
+
+        List<Movie> GetMovies(); //nose
 
         List<Movie> GetAllEntities();
 

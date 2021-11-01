@@ -1,4 +1,4 @@
-﻿using Alkemy_Challenge.Interface;
+﻿using Alkemy_Challenge.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,12 @@ namespace Alkemy_Challenge.Repositories
         where TContext : DbContext
     {
         private readonly TContext _dbContext;
+        private DbSet<TEntity> _dbSet;
+
+        protected DbSet<TEntity> DbSet
+        {
+            get { return _dbSet ??= _dbContext.Set<TEntity>(); }
+        }
 
         protected BaseRepository(TContext dbContext)
         {

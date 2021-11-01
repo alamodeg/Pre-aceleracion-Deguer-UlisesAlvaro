@@ -1,5 +1,6 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
+using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +15,9 @@ namespace Alkemy_Challenge.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        private readonly MovieRepository _movieRepository;
+        private readonly IMovieRepository _movieRepository;
 
-        public MovieController(MovieRepository movieRepository)
+        public MovieController(IMovieRepository movieRepository)
         {
             _movieRepository = movieRepository;
         }
