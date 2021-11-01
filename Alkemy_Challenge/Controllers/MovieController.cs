@@ -1,5 +1,6 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
+using Alkemy_Challenge.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,43 +14,44 @@ namespace Alkemy_Challenge.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        private readonly DisneyContext _context;
+        private readonly MovieRepository _movieRepository;
 
-        public MovieController(DisneyContext context)
+        public MovieController(MovieRepository movieRepository)
         {
-            _context = context;
+            _movieRepository = movieRepository;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Movies.ToList());
+            var movies = _movieRepository.GetAllEntities();
+            return Ok(movies);
         }
-
+        
         [HttpPost]
         public IActionResult Post(Movie movie)
         {
-            _context.Movies.Add(movie);
-            _context.SaveChanges();
-            return Ok(_context.Movies.ToList());
+            _movieRepository.Add(movie);
+            return Ok(movie);
         }
 
         [HttpPut]
         public IActionResult Put(Movie movie)
         {
-            if (_context.Movies.FirstOrDefault(mov => mov.Id == movie.Id) == null)
+            var movieToEdit = _movieRepository.GetMovie(movie.Id);
+
+            if (movieToEdit == null)
             {
-                return BadRequest("La pelicula buscada no existe");
+                return NotFound("La pelicula buscada no existe");
             }
             else
             {
-                var internalMovie = _context.Movies.Find(movie.Id);
+                movieToEdit.Title = movie.Title;
+                movieToEdit.Genre = movie.Genre;
+                movieToEdit.Rating = movie.Rating;
 
-                internalMovie.Title = movie.Title;
-                internalMovie.Genre = movie.Genre;
-                internalMovie.Rating = movie.Rating;
-                _context.SaveChanges();
-                return Ok(_context.Movies.ToList());
+                _movieRepository.Update(movieToEdit);
+                return Ok(movieToEdit);
             }
         }
 
@@ -57,16 +59,17 @@ namespace Alkemy_Challenge.Controllers
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
-            if (_context.Movies.FirstOrDefault(mov => mov.Id == id) == null)
+            var movieToDelete = _movieRepository.GetMovie(id);
+
+            if (movieToDelete == null)
             {
-                return BadRequest("La pelicula buscada no existe");
+                return NotFound("La pelicula buscada no existe");
             }
             else 
             {
-                var internalMovie = _context.Movies.Find(id);
-                _context.Movies.Remove(internalMovie);
-                _context.SaveChanges();
-                return Ok(_context.Movies.ToList());
+                _movieRepository.Delete(id);
+
+                return Ok("Pelicula eliminada");
             }
         }
     }

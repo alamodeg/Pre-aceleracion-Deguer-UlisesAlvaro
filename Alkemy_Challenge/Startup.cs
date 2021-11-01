@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Alkemy_Challenge.Repositories;
+using Alkemy_Challenge.Interface;
 
 namespace Alkemy_Challenge
 {
@@ -41,6 +43,7 @@ namespace Alkemy_Challenge
                 options.UseSqlServer(@"Data Source = (localdb)\MSSQLLocalDB; Database = DisneyDB; Integrated Security = True;");
             
             });
+            services.AddScoped<IMovieRepository, MovieRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
