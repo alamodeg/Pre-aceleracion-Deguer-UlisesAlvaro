@@ -1,5 +1,6 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
+using Alkemy_Challenge.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,63 +9,65 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class GenreController : ControllerBase
     {
-        private readonly DisneyContext _context;
+        private readonly IGenreRepository _genreRepository;
 
-        public GenreController(DisneyContext context)
+        public GenreController(IGenreRepository genreRepository)
         {
-            _context = context;
+            _genreRepository = genreRepository;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Genres.ToList());
+            var genres = _genreRepository.GetGenres();
+            return Ok(genres);
         }
 
         [HttpPost]
         public IActionResult Post(Genre genre)
         {
-            _context.Genres.Add(genre);
-            _context.SaveChanges();
-            return Ok(_context.Genres.ToList());
+            _genreRepository.Add(genre);
+            return Ok(genre);
         }
-
+        
         [HttpPut]
         public IActionResult Put(Genre genre)
         {
-            if (_context.Genres.FirstOrDefault(gen => gen.Id == genre.Id) == null)
+            var genreToEdit = _genreRepository.GetGenre(genre.Id);
+
+            if (genreToEdit == null)
             {
-                return BadRequest("El genero buscado no existe");
+                return NotFound("El genero buscado no existe");
             }
             else
             {
-                var internalGenre = _context.Genres.Find(genre.Id);
+                genreToEdit.Image = genre.Image;
+                genreToEdit.Name = genre.Name;
 
-                internalGenre.Name = genre.Name;
-                internalGenre.Image = genre.Image;
-                _context.SaveChanges();
-                return Ok(_context.Genres.ToList());
+                _genreRepository.Update(genreToEdit);
+                return Ok(genreToEdit);
             }
         }
-
+        
         [HttpDelete]
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
-            if (_context.Genres.FirstOrDefault(gen => gen.Id == id) == null)
+            var genreToEdit = _genreRepository.GetGenre(id);
+
+            if (genreToEdit == null)
             {
-                return BadRequest("El genero buscado no existe");
+                return NotFound("El genero buscado no existe");
             }
             else
             {
-                var internalGenre = _context.Genres.Find(id);
-                _context.Genres.Remove(internalGenre);
-                _context.SaveChanges();
-                return Ok(_context.Genres.ToList());
+                _genreRepository.Delete(id);
+
+                return Ok("Genero eliminado");
             }
         }
     }

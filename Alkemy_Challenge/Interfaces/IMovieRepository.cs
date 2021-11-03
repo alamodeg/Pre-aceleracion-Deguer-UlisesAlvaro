@@ -3,20 +3,10 @@ using System.Collections.Generic;
 
 namespace Alkemy_Challenge.Interfaces
 {
-    public interface IMovieRepository
+    public interface IMovieRepository : IBaseRepository<Movie>
     {
-        Movie GetMovie(int id); //si
+        Movie GetMovie(int id);
 
-        List<Movie> GetMovies(); //nose
-
-        List<Movie> GetAllEntities();
-
-        Movie GetEntity(int id);
-
-        Movie Add(Movie entity);
-
-        Movie Update(Movie entity);
-
-        void Delete(int id);
+        List<Movie> GetMovies();
     }
 }

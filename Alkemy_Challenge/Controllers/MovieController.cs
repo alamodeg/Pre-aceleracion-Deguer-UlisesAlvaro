@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class MovieController : ControllerBase
     {
         private readonly IMovieRepository _movieRepository;
@@ -25,7 +25,7 @@ namespace Alkemy_Challenge.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var movies = _movieRepository.GetAllEntities();
+            var movies = _movieRepository.GetMovies();
             return Ok(movies);
         }
         

@@ -1,5 +1,6 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
+using Alkemy_Challenge.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,46 +9,47 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
-        private readonly DisneyContext _context;
+        private readonly ICharacterRepository _characterRepository;
 
-        public CharacterController(DisneyContext context)
+        public CharacterController(ICharacterRepository characterRepository)
         {
-            _context = context;
+            _characterRepository = characterRepository;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Characters.ToList());
+            var characters = _characterRepository.GetCharacters();
+            return Ok(characters);
         }
 
         [HttpPost]
-        public IActionResult Post(Character charac)
+        public IActionResult Post(Character character)
         {
-            _context.Characters.Add(charac);
-            _context.SaveChanges();
-            return Ok(_context.Characters.ToList());
+            _characterRepository.Add(character);
+            return Ok(character);
         }
 
         [HttpPut]
-        public IActionResult Put(Character charac)
+        public IActionResult Put(Character character)
         {
-            if (_context.Characters.FirstOrDefault(charac => charac.Id == charac.Id) == null)
+            var characterToEdit = _characterRepository.GetCharacter(character.Id);
+
+            if (characterToEdit == null)
             {
-                return BadRequest("El personaje buscado no existe");
+                return NotFound("El personaje buscado no existe");
             }
             else
             {
-                var internalCharacter = _context.Characters.Find(charac.Id);
+                characterToEdit.Name = character.Name;
+                characterToEdit.Age = character.Age;
 
-                internalCharacter.Name = charac.Name;
-                internalCharacter.Age = charac.Age;
-                _context.SaveChanges();
-                return Ok(_context.Characters.ToList());
+                _characterRepository.Update(characterToEdit);
+                return Ok(characterToEdit);
             }
         }
 
@@ -55,16 +57,17 @@ namespace Alkemy_Challenge.Controllers
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
-            if (_context.Characters.FirstOrDefault(charac => charac.Id == id) == null)
+            var characterToEdit = _characterRepository.GetCharacter(id);
+
+            if (characterToEdit == null)
             {
-                return BadRequest("El personaje buscado no existe");
+                return NotFound("El personaje buscado no existe");
             }
             else
             {
-                var internalCharacter = _context.Characters.Find(id);
-                _context.Characters.Remove(internalCharacter);
-                _context.SaveChanges();
-                return Ok(_context.Characters.ToList());
+                _characterRepository.Delete(id);
+
+                return Ok("Personaje eliminado");
             }
         }
     }

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.Repositories
 {
-    public abstract class BaseRepository<TEntity, TContext> : IBaseRepository<TEntity>
+    public abstract class BaseRepository<TEntity, TContext> : IBaseRepository<TEntity> 
         where TEntity : class
         where TContext : DbContext
     {
         private readonly TContext _dbContext;
-        private DbSet<TEntity> _dbSet;
+        private DbSet<TEntity> _dbSet; 
 
         protected DbSet<TEntity> DbSet
         {
