@@ -27,6 +27,42 @@ namespace Alkemy_Challenge.Controllers
             return Ok(characters);
         }
 
+        [HttpGet]
+        [Route("BusquedaPersonaje")]
+        public IActionResult Get(string name, int age, float weight, int idMovie)
+        {
+            var characters = _characterRepository.GetCharacters();
+            
+            if (!string.IsNullOrEmpty(name))
+            {
+                characters = characters.Where(x => x.Name == name).ToList();
+            }
+
+            if (!(age < 1))
+            {
+                characters = characters.Where(x => x.Age == age).ToList();
+            }
+
+            if (!(weight < 1))
+            {
+                characters = characters.Where(x => x.Weight == weight).ToList();
+            }
+
+            //FALTA FUNCIONALIDAD
+            if (!(idMovie < 1))
+            {
+                //characters.ForEach(charac => charac.Movies.ToList().RemoveAll( x => x.Id != idMovie ));
+            }
+
+
+            if (!characters.Any())
+            {
+                return NoContent();
+            } 
+
+            return Ok(characters);
+        }
+
         [HttpPost]
         public IActionResult Post(Character character)
         {

@@ -28,7 +28,27 @@ namespace Alkemy_Challenge.Controllers
             var movies = _movieRepository.GetMovies();
             return Ok(movies);
         }
-        
+
+        [HttpGet]
+        [Route("BusquedaPelicula")]
+        public IActionResult Get(string title)
+        {
+            var movies = _movieRepository.GetMovies();
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                movies = movies.Where(x => x.Title == title).OrderBy(x => x.CreationDate).ToList();
+            }
+            
+            movies = movies.OrderBy(x => x.CreationDate).ToList();
+
+            if (!movies.Any())
+            {
+                return NoContent();
+            }
+            return Ok(movies);
+        }
+
         [HttpPost]
         public IActionResult Post(Movie movie)
         {
