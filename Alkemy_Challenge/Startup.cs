@@ -41,7 +41,7 @@ namespace Alkemy_Challenge
             services.AddDbContext<DisneyContext>((services,options)=> 
             {
                 options.UseInternalServiceProvider(services);
-                options.UseSqlServer(@"Data Source = (localdb)\MSSQLLocalDB; Database = DisneyDB; Integrated Security = True;");
+                options.UseSqlServer(Configuration.GetConnectionString("default"));
             
             });
             services.AddScoped<IMovieRepository, MovieRepository>();

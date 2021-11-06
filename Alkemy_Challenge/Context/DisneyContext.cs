@@ -19,15 +19,6 @@ namespace Alkemy_Challenge.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.HasDefaultSchema(Schema);
-
-            //modelBuilder.Entity<Movie>().HasData(
-            //    new Movie()
-            //    {
-            //        Id = 1,
-            //        Title = "Titanic",
-            //        CreationDate = new DateTime(2015, 12, 31),
-            //        Rating = 4,
-            //    });
         }
 
         public DbSet<Character> Characters { get; set; } = null!;
