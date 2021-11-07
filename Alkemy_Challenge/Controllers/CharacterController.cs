@@ -1,6 +1,7 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
 using Alkemy_Challenge.Interfaces;
+using Alkemy_Challenge.ViewModels.Character;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,56 +25,88 @@ namespace Alkemy_Challenge.Controllers
         public IActionResult Get()
         {
             var characters = _characterRepository.GetCharacters();
-            return Ok(characters);
+            var charactersModel = new List<GetAllCharactersViewModel>();
+
+            foreach (var character in characters)
+            {
+                GetAllCharactersViewModel tempCharac = new()
+                {
+                    Id = character.Id,
+                    Age = character.Age,
+                    Name = character.Name,
+                    Image = character.Image,
+                    Weight = character.Weight,
+                    Story = character.Story,
+                    Movies = character.Movies
+                };
+                charactersModel.Add(tempCharac);
+            }
+            return Ok(charactersModel);
         }
 
         [HttpGet]
-        [Route("BusquedaPersonaje")]
+        [Route("Characters")]
         public IActionResult Get(string name, int age, float weight, int idMovie)
         {
             var characters = _characterRepository.GetCharacters();
-            
+            var charactersModel = new List<GetListadoPersonajesViewModel>();
+
+            if (!characters.Any())
+            {
+                return NoContent();
+            }
+
             if (!string.IsNullOrEmpty(name))
             {
                 characters = characters.Where(x => x.Name == name).ToList();
             }
 
-            if (!(age < 1))
+            if (age > 0)
             {
                 characters = characters.Where(x => x.Age == age).ToList();
             }
 
-            if (!(weight < 1))
+            if (weight > 0)
             {
                 characters = characters.Where(x => x.Weight == weight).ToList();
             }
 
             //FALTA FUNCIONALIDAD
-            if (!(idMovie < 1))
+            if (idMovie > 0)
             {
                 //characters.ForEach(charac => charac.Movies.ToList().RemoveAll( x => x.Id != idMovie ));
             }
 
-
-            if (!characters.Any())
+            foreach (var x in characters)
             {
-                return NoContent();
-            } 
-
-            return Ok(characters);
+                GetListadoPersonajesViewModel tempCharac = new()
+                {
+                    Name = x.Name,
+                    Image = x.Image
+                };
+                charactersModel.Add(tempCharac);
+            }
+            return Ok(charactersModel);
         }
 
         [HttpPost]
-        public IActionResult Post(Character character)
+        public IActionResult Post(PostRequestViewModel model)
         {
-            _characterRepository.Add(character);
-            return Ok(character);
+            Character NewCharacter = new Character
+            {
+                Image = model.Image,
+                Name = model.Name,
+                Age = model.Age
+                
+            };
+            _characterRepository.Add(NewCharacter);
+            return Ok(NewCharacter);
         }
 
         [HttpPut]
-        public IActionResult Put(Character character)
+        public IActionResult Put(PutRequestViewModel model)
         {
-            var characterToEdit = _characterRepository.GetCharacter(character.Id);
+            var characterToEdit = _characterRepository.GetCharacter(model.Id);
 
             if (characterToEdit == null)
             {
@@ -81,9 +114,8 @@ namespace Alkemy_Challenge.Controllers
             }
             else
             {
-                characterToEdit.Name = character.Name;
-                characterToEdit.Age = character.Age;
-
+                characterToEdit.Name = model.Name;
+                characterToEdit.Age = model.Age;
                 _characterRepository.Update(characterToEdit);
                 return Ok(characterToEdit);
             }
