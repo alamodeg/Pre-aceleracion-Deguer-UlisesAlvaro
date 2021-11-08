@@ -15,6 +15,12 @@ using Microsoft.EntityFrameworkCore;
 using Alkemy_Challenge.Repositories;
 using Alkemy_Challenge.Interfaces;
 using Newtonsoft.Json;
+using Alkemy_Challenge.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Alkemy_Challenge
 {
@@ -35,15 +41,84 @@ namespace Alkemy_Challenge
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Alkemy_Challenge", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer",
+                    new OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Description = "Ingrese Bearer [Token] para poder autenticarse dentro de la aplicacion"
+                    });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
             });
+
+            services.AddAuthorization(options =>
+            {
+                var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
+                    JwtBearerDefaults.AuthenticationScheme);
+
+                defaultAuthorizationPolicyBuilder =
+                    defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
+
+                options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+            });
+
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<UserContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidAudience = "https://localhost:5000",
+                        ValidIssuer = "https://localhost:5000",
+                        IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeySuperSecretayLargaDeAUTORIZACION"))
+                    };
+                });
 
             services.AddEntityFrameworkSqlServer(); 
             services.AddDbContext<DisneyContext>((services,options)=> 
             {
                 options.UseInternalServiceProvider(services);
-                options.UseSqlServer(Configuration.GetConnectionString("default"));
+                options.UseSqlServer(Configuration.GetConnectionString("DisneyConecctionString"));
             
             });
+            services.AddDbContext<UserContext>((services, options) =>
+            {
+                options.UseInternalServiceProvider(services);
+                options.UseSqlServer(Configuration.GetConnectionString("UserConecctionString"));
+
+            });
+
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IGenreRepository, GenreRepository>();
             services.AddScoped<ICharacterRepository, CharacterRepository>();

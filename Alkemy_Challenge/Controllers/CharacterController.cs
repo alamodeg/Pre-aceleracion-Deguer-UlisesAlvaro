@@ -2,6 +2,7 @@
 using Alkemy_Challenge.Entities;
 using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.ViewModels.Character;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Alkemy_Challenge.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CharacterController : ControllerBase
     {
         private readonly ICharacterRepository _characterRepository;
@@ -22,6 +24,7 @@ namespace Alkemy_Challenge.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Get()
         {
             var characters = _characterRepository.GetCharacters();

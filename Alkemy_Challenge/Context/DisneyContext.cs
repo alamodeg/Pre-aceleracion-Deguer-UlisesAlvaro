@@ -11,7 +11,7 @@ namespace Alkemy_Challenge.Context
     {
         private const string Schema = "Disney";
 
-        public DisneyContext(DbContextOptions options) : base(options)
+        public DisneyContext(DbContextOptions<DisneyContext> options) : base(options)
         {
         }
 

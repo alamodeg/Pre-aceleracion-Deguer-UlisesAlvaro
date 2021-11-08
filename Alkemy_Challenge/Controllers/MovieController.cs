@@ -2,6 +2,7 @@
 using Alkemy_Challenge.Entities;
 using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,6 +14,7 @@ namespace Alkemy_Challenge.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class MovieController : ControllerBase
     {
         private readonly IMovieRepository _movieRepository;
@@ -23,6 +25,7 @@ namespace Alkemy_Challenge.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Get()
         {
             var movies = _movieRepository.GetMovies();
