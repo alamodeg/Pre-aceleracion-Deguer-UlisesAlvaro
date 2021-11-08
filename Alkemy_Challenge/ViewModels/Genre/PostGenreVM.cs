@@ -4,18 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alkemy_Challenge.ViewModels.Character
+namespace Alkemy_Challenge.ViewModels.Genre
 {
-    public class PutRequestViewModel
+    public class PostGenreVM
     {
         [Required]
-        public int Id { get; set; }
+        public string Image { get; set; }
 
         [Required]
         public string Name { get; set; }
-
-        [Required]
-        [Range(1, 150)]
-        public int Age { get; set; }
     }
 }

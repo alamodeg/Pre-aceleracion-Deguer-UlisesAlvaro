@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.ViewModels.Character
 {
-    public class PostRequestViewModel
+    public class PostCharacterVM
     {
         [Required]
         public string Image { get; set; }

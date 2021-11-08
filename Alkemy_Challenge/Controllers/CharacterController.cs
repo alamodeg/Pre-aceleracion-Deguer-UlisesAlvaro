@@ -25,14 +25,15 @@ namespace Alkemy_Challenge.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [Route("Characters-FullDetails")]
         public IActionResult Get()
         {
             var characters = _characterRepository.GetCharacters();
-            var charactersModel = new List<GetAllCharactersViewModel>();
+            var charactersModel = new List<GetFullDetailsCharacterVM>();
 
             foreach (var character in characters)
             {
-                GetAllCharactersViewModel tempCharac = new()
+                GetFullDetailsCharacterVM tempCharac = new()
                 {
                     Id = character.Id,
                     Age = character.Age,
@@ -49,10 +50,31 @@ namespace Alkemy_Challenge.Controllers
 
         [HttpGet]
         [Route("Characters")]
+        [AllowAnonymous]
+        public IActionResult GetFormated()
+        {
+            var characters = _characterRepository.GetCharacters();
+            var charactersModel = new List<GetFormattedCharacterVM>();
+
+            foreach (var character in characters)
+            {
+                GetFormattedCharacterVM tempCharac = new()
+                {
+                    Name = character.Name,
+                    Image = character.Image
+                };
+                charactersModel.Add(tempCharac);
+            }
+            return Ok(charactersModel);
+        }
+
+        [HttpGet]
+        [Route("Search")]
+        [AllowAnonymous]
         public IActionResult Get(string name, int age, float weight, int idMovie)
         {
             var characters = _characterRepository.GetCharacters();
-            var charactersModel = new List<GetListadoPersonajesViewModel>();
+            var charactersModel = new List<GetFormattedCharacterVM>();
 
             if (!characters.Any())
             {
@@ -73,16 +95,15 @@ namespace Alkemy_Challenge.Controllers
             {
                 characters = characters.Where(x => x.Weight == weight).ToList();
             }
-
             //FALTA FUNCIONALIDAD
             if (idMovie > 0)
             {
-                //characters.ForEach(charac => charac.Movies.ToList().RemoveAll( x => x.Id != idMovie ));
+                characters = characters.Where(x => x.Movies.Any(x => x.Id == idMovie)).ToList();
             }
 
             foreach (var x in characters)
             {
-                GetListadoPersonajesViewModel tempCharac = new()
+                GetFormattedCharacterVM tempCharac = new()
                 {
                     Name = x.Name,
                     Image = x.Image
@@ -93,7 +114,7 @@ namespace Alkemy_Challenge.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(PostRequestViewModel model)
+        public IActionResult Post(PostCharacterVM model)
         {
             Character NewCharacter = new Character
             {
@@ -107,7 +128,7 @@ namespace Alkemy_Challenge.Controllers
         }
 
         [HttpPut]
-        public IActionResult Put(PutRequestViewModel model)
+        public IActionResult Put(PutCharacterVM model)
         {
             var characterToEdit = _characterRepository.GetCharacter(model.Id);
 

@@ -17,12 +17,12 @@ namespace Alkemy_Challenge.Repositories
 
         public Movie GetMovie(int id)
         {
-            return DbSet.Include(x => x.Genre).Include(x => x.Characters).FirstOrDefault(x => x.Id == id);
+            return DbSet.Include(x => x.Characters).Include(x => x.Genre).FirstOrDefault(x => x.Id == id);
         }
 
         public List<Movie> GetMovies()
         {
-            return DbSet.Include(x => x.Genre).Include(x => x.Characters).ToList();
+            return DbSet.Include(x => x.Characters).Include(x => x.Genre).ToList();
         }
     }
 }

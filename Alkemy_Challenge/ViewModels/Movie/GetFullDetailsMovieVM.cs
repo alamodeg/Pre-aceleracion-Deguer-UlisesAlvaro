@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alkemy_Challenge.Entities
+namespace Alkemy_Challenge.ViewModels.Movie
 {
-    public class Movie
+    public class GetFullDetailsMovieVM
     {
         public int Id { get; set; }
 
@@ -18,8 +17,8 @@ namespace Alkemy_Challenge.Entities
 
         public int Rating { get; set; }
 
-        public Genre Genre { get; set; }
+        public Entities.Genre Genre { get; set; }
 
-        public ICollection<Character> Characters { get; set; }
+        public ICollection<Entities.Character> Characters { get; set; }
     }
 }

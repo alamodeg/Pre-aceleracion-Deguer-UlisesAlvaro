@@ -1,6 +1,7 @@
 ﻿using Alkemy_Challenge.Context;
 using Alkemy_Challenge.Entities;
 using Alkemy_Challenge.Interfaces;
+using Alkemy_Challenge.ViewModels.Genre;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,24 +24,43 @@ namespace Alkemy_Challenge.Controllers
         }
 
         [HttpGet]
+        [Route("Genre-FullDetails")]
         [AllowAnonymous]
         public IActionResult Get()
         {
             var genres = _genreRepository.GetGenres();
-            return Ok(genres);
+            var genresModel = new List<GetFullDetalisGenreVM>();
+
+            foreach (var Genre in genres)
+            {
+                GetFullDetalisGenreVM tempGenre = new()
+                {
+                    Id = Genre.Id,
+                    Name = Genre.Name,
+                    Image = Genre.Image,
+                    Movies = Genre.Movies
+                };
+                genresModel.Add(tempGenre);
+            }
+            return Ok(genresModel);
         }
 
         [HttpPost]
-        public IActionResult Post(Genre genre)
+        public IActionResult Post(PostGenreVM model)
         {
-            _genreRepository.Add(genre);
-            return Ok(genre);
+            Genre NewGenre = new Genre
+            {
+                Name = model.Name,
+                Image = model.Image
+            };
+            _genreRepository.Add(NewGenre);
+            return Ok(NewGenre);
         }
         
         [HttpPut]
-        public IActionResult Put(Genre genre)
+        public IActionResult Put(PutGenreVM model)
         {
-            var genreToEdit = _genreRepository.GetGenre(genre.Id);
+            var genreToEdit = _genreRepository.GetGenre(model.Id);
 
             if (genreToEdit == null)
             {
@@ -48,8 +68,8 @@ namespace Alkemy_Challenge.Controllers
             }
             else
             {
-                genreToEdit.Image = genre.Image;
-                genreToEdit.Name = genre.Name;
+                genreToEdit.Image = model.Image;
+                genreToEdit.Name = model.Name;
 
                 _genreRepository.Update(genreToEdit);
                 return Ok(genreToEdit);

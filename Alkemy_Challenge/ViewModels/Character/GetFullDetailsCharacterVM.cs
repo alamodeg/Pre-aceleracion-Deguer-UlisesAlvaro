@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.ViewModels.Character
 {
-    public class GetAllCharactersViewModel
+    public class GetFullDetailsCharacterVM
     {
         public int Id { get; set; }
 
@@ -20,6 +20,6 @@ namespace Alkemy_Challenge.ViewModels.Character
 
         public string Story { get; set; }
 
-        public ICollection<Movie> Movies { get; set; }
+        public ICollection<Entities.Movie> Movies { get; set; }
     }
 }

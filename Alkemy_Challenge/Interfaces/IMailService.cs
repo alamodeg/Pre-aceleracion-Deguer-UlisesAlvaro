@@ -4,6 +4,6 @@ namespace Alkemy_Challenge.Interfaces
 {
     public interface IMailService
     {
-        Task SendEmail();
+        Task SendEmail(string name);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Alkemy_Challenge.ViewModels.Character
 {
-    public class GetListadoPersonajesViewModel
+    public class GetFormattedCharacterVM
     {
         public string Name { get; set; }
 

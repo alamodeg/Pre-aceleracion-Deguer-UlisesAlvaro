@@ -4,22 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alkemy_Challenge.Entities
+namespace Alkemy_Challenge.ViewModels.Movie
 {
-    public class Movie
+    public class GetFormattedMovieVM
     {
-        public int Id { get; set; }
-
+        [Required]
+        [MaxLength(150)]
         public string Image { get; set; }
 
+        [Required]
+        [MaxLength(150)]
         public string Title { get; set; }
 
+        [Required]
         public DateTime CreationDate { get; set; }
-
-        public int Rating { get; set; }
-
-        public Genre Genre { get; set; }
-
-        public ICollection<Character> Characters { get; set; }
     }
 }
