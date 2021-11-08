@@ -101,7 +101,7 @@ namespace Alkemy_Challenge
                         ValidAudience = "https://localhost:5000",
                         ValidIssuer = "https://localhost:5000",
                         IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes("KeySuperSecretayLargaDeAUTORIZACION"))
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"]))
                     };
                 });
 
