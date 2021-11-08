@@ -126,6 +126,7 @@ namespace Alkemy_Challenge.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var characterToEdit = _characterRepository.GetCharacter(id);

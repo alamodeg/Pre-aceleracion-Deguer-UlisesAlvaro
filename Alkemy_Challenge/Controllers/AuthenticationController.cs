@@ -21,11 +21,13 @@ namespace Alkemy_Challenge.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signManager)
+        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signManager = signManager;
+            _roleManager = roleManager;
         }
 
         [HttpPost]
@@ -61,6 +63,56 @@ namespace Alkemy_Challenge.Controllers
                         message = $"User creation failed!  ERROR: {String.Join(", ",result.Errors.Select(x=>x.Description))}"
                     });
             }
+
+            return Ok(new
+            {
+                Status = "Success",
+                message = $"User creation Successfully!"
+            });
+        }
+
+        [HttpPost]
+        [Route("register-admin")]
+        public async Task<IActionResult> RegisterAdmin(RegisterRequestViewModel model)
+        {
+            var userExists = await _userManager.FindByNameAsync(model.Username);
+
+            if (userExists != null)
+            {
+                return BadRequest(new
+                {
+                    Status = "Error",
+                    Message = $"User creation failed for {model.Username}"
+                });
+            }
+
+            var user = new User()
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                IsActive = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Status = "Error",
+                        message = $"User creation failed!  ERROR: {String.Join(", ", result.Errors.Select(x => x.Description))}"
+                    });
+            }
+
+            if (!await _roleManager.RoleExistsAsync("User"))
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+            
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+
+            await _userManager.AddToRoleAsync(user,"User");
+
 
             return Ok(new
             {
