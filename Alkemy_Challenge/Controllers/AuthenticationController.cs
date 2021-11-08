@@ -1,4 +1,5 @@
 ﻿using Alkemy_Challenge.Entities;
+using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.ViewModels.Auth;
 using Alkemy_Challenge.ViewModels.Auth.Login;
 using Microsoft.AspNetCore.Http;
@@ -22,12 +23,14 @@ namespace Alkemy_Challenge.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IMailService _mailService;
 
-        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signManager, RoleManager<IdentityRole> roleManager)
+        public AuthenticationController(UserManager<User> userManager, SignInManager<User> signManager, RoleManager<IdentityRole> roleManager, IMailService mailService)
         {
             _userManager = userManager;
             _signManager = signManager;
             _roleManager = roleManager;
+            _mailService = mailService;
         }
 
         [HttpPost]
@@ -63,6 +66,8 @@ namespace Alkemy_Challenge.Controllers
                         message = $"User creation failed!  ERROR: {String.Join(", ",result.Errors.Select(x=>x.Description))}"
                     });
             }
+
+            await _mailService.SendEmail(model.Username);
 
             return Ok(new
             {

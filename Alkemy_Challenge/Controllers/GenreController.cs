@@ -58,6 +58,7 @@ namespace Alkemy_Challenge.Controllers
         
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var genreToEdit = _genreRepository.GetGenre(id);

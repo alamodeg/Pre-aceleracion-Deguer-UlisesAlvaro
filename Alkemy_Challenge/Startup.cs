@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using SendGrid.Extensions.DependencyInjection;
+using Alkemy_Challenge.Services;
 
 namespace Alkemy_Challenge
 {
@@ -122,6 +124,13 @@ namespace Alkemy_Challenge
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IGenreRepository, GenreRepository>();
             services.AddScoped<ICharacterRepository, CharacterRepository>();
+
+            services.AddSendGrid(options =>
+            {
+                options.ApiKey = Configuration["SentGridApiKey"];
+            });
+            services.AddScoped<IMailService, MailService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
