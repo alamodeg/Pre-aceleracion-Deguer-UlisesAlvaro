@@ -4,6 +4,7 @@ using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.ViewModels.Genre;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace Alkemy_Challenge.Controllers
     public class GenreController : ControllerBase
     {
         private readonly IGenreRepository _genreRepository;
+        private readonly ILogger<GenreController> _logger;
 
-        public GenreController(IGenreRepository genreRepository)
+        public GenreController(IGenreRepository genreRepository, ILogger<GenreController> logger)
         {
             _genreRepository = genreRepository;
+            _logger = logger;
+            _logger.LogDebug(1, "NLog injected into GenreController");
         }
 
         [HttpGet]
@@ -28,51 +32,75 @@ namespace Alkemy_Challenge.Controllers
         [AllowAnonymous]
         public IActionResult Get()
         {
-            var genres = _genreRepository.GetGenres();
-            var genresModel = new List<GetFullDetalisGenreVM>();
-
-            foreach (var Genre in genres)
+            try
             {
-                GetFullDetalisGenreVM tempGenre = new()
+                var genres = _genreRepository.GetGenres();
+                var genresModel = new List<GetFullDetalisGenreVM>();
+
+                foreach (var Genre in genres)
                 {
-                    Id = Genre.Id,
-                    Name = Genre.Name,
-                    Image = Genre.Image,
-                    Movies = Genre.Movies
-                };
-                genresModel.Add(tempGenre);
+                    GetFullDetalisGenreVM tempGenre = new()
+                    {
+                        Id = Genre.Id,
+                        Name = Genre.Name,
+                        Image = Genre.Image,
+                        Movies = Genre.Movies
+                    };
+                    genresModel.Add(tempGenre);
+                }
+                return Ok(genresModel);
             }
-            return Ok(genresModel);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
         public IActionResult Post(PostGenreVM model)
         {
-            Genre NewGenre = new Genre
+            try
             {
-                Name = model.Name,
-                Image = model.Image
-            };
-            _genreRepository.Add(NewGenre);
-            return Ok(NewGenre);
+                Genre NewGenre = new Genre
+                {
+                    Name = model.Name,
+                    Image = model.Image
+                };
+                _genreRepository.Add(NewGenre);
+                return Ok(NewGenre);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
         
         [HttpPut]
         public IActionResult Put(PutGenreVM model)
         {
-            var genreToEdit = _genreRepository.GetGenre(model.Id);
-
-            if (genreToEdit == null)
+            try
             {
-                return NotFound("El genero buscado no existe");
+                var genreToEdit = _genreRepository.GetGenre(model.Id);
+
+                if (genreToEdit == null)
+                {
+                    return NotFound("El genero buscado no existe");
+                }
+                else
+                {
+                    genreToEdit.Image = model.Image;
+                    genreToEdit.Name = model.Name;
+
+                    _genreRepository.Update(genreToEdit);
+                    return Ok(genreToEdit);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                genreToEdit.Image = model.Image;
-                genreToEdit.Name = model.Name;
-
-                _genreRepository.Update(genreToEdit);
-                return Ok(genreToEdit);
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
             }
         }
         
@@ -81,17 +109,25 @@ namespace Alkemy_Challenge.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var genreToEdit = _genreRepository.GetGenre(id);
-
-            if (genreToEdit == null)
+            try
             {
-                return NotFound("El genero buscado no existe");
+                var genreToEdit = _genreRepository.GetGenre(id);
+
+                if (genreToEdit == null)
+                {
+                    return NotFound("El genero buscado no existe");
+                }
+                else
+                {
+                    _genreRepository.Delete(id);
+
+                    return Ok("Genero eliminado");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _genreRepository.Delete(id);
-
-                return Ok("Genero eliminado");
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
             }
         }
     }

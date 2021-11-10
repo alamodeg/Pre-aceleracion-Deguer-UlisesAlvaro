@@ -110,6 +110,8 @@ namespace Alkemy_Challenge.Controllers
                     });
             }
 
+            await _mailService.SendEmail(model.Username);
+
             if (!await _roleManager.RoleExistsAsync("User"))
                 await _roleManager.CreateAsync(new IdentityRole("User"));
             

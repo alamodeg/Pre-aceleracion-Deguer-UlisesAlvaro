@@ -4,6 +4,7 @@ using Alkemy_Challenge.Interfaces;
 using Alkemy_Challenge.ViewModels.Character;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace Alkemy_Challenge.Controllers
     public class CharacterController : ControllerBase
     {
         private readonly ICharacterRepository _characterRepository;
+        private readonly ILogger<CharacterController> _logger;
 
-        public CharacterController(ICharacterRepository characterRepository)
+        public CharacterController(ICharacterRepository characterRepository, ILogger<CharacterController> logger)
         {
             _characterRepository = characterRepository;
+            _logger = logger;
+            _logger.LogDebug(1, "NLog injected into CharacterController");
         }
 
         [HttpGet]
@@ -28,24 +32,32 @@ namespace Alkemy_Challenge.Controllers
         [Route("Characters-FullDetails")]
         public IActionResult Get()
         {
-            var characters = _characterRepository.GetCharacters();
-            var charactersModel = new List<GetFullDetailsCharacterVM>();
-
-            foreach (var character in characters)
+            try
             {
-                GetFullDetailsCharacterVM tempCharac = new()
+                var characters = _characterRepository.GetCharacters();
+                var charactersModel = new List<GetFullDetailsCharacterVM>();
+
+                foreach (var character in characters)
                 {
-                    Id = character.Id,
-                    Age = character.Age,
-                    Name = character.Name,
-                    Image = character.Image,
-                    Weight = character.Weight,
-                    Story = character.Story,
-                    Movies = character.Movies
-                };
-                charactersModel.Add(tempCharac);
+                    GetFullDetailsCharacterVM tempCharac = new()
+                    {
+                        Id = character.Id,
+                        Age = character.Age,
+                        Name = character.Name,
+                        Image = character.Image,
+                        Weight = character.Weight,
+                        Story = character.Story,
+                        Movies = character.Movies
+                    };
+                    charactersModel.Add(tempCharac);
+                }
+                return Ok(charactersModel);
             }
-            return Ok(charactersModel);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpGet]
@@ -53,19 +65,27 @@ namespace Alkemy_Challenge.Controllers
         [AllowAnonymous]
         public IActionResult GetFormated()
         {
-            var characters = _characterRepository.GetCharacters();
-            var charactersModel = new List<GetFormattedCharacterVM>();
-
-            foreach (var character in characters)
+            try
             {
-                GetFormattedCharacterVM tempCharac = new()
+                var characters = _characterRepository.GetCharacters();
+                var charactersModel = new List<GetFormattedCharacterVM>();
+
+                foreach (var character in characters)
                 {
-                    Name = character.Name,
-                    Image = character.Image
-                };
-                charactersModel.Add(tempCharac);
+                    GetFormattedCharacterVM tempCharac = new()
+                    {
+                        Name = character.Name,
+                        Image = character.Image
+                    };
+                    charactersModel.Add(tempCharac);
+                }
+                return Ok(charactersModel);
             }
-            return Ok(charactersModel);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpGet]
@@ -73,75 +93,99 @@ namespace Alkemy_Challenge.Controllers
         [AllowAnonymous]
         public IActionResult Get(string name, int age, float weight, int idMovie)
         {
-            var characters = _characterRepository.GetCharacters();
-            var charactersModel = new List<GetFormattedCharacterVM>();
+            try
+            {
+                var characters = _characterRepository.GetCharacters();
+                var charactersModel = new List<GetFormattedCharacterVM>();
 
-            if (!characters.Any())
-            {
-                return NoContent();
-            }
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                characters = characters.Where(x => x.Name == name).ToList();
-            }
-
-            if (age > 0)
-            {
-                characters = characters.Where(x => x.Age == age).ToList();
-            }
-
-            if (weight > 0)
-            {
-                characters = characters.Where(x => x.Weight == weight).ToList();
-            }
-            //FALTA FUNCIONALIDAD
-            if (idMovie > 0)
-            {
-                characters = characters.Where(x => x.Movies.Any(x => x.Id == idMovie)).ToList();
-            }
-
-            foreach (var x in characters)
-            {
-                GetFormattedCharacterVM tempCharac = new()
+                if (!characters.Any())
                 {
-                    Name = x.Name,
-                    Image = x.Image
-                };
-                charactersModel.Add(tempCharac);
+                    return NoContent();
+                }
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    characters = characters.Where(x => x.Name == name).ToList();
+                }
+
+                if (age > 0)
+                {
+                    characters = characters.Where(x => x.Age == age).ToList();
+                }
+
+                if (weight > 0)
+                {
+                    characters = characters.Where(x => x.Weight == weight).ToList();
+                }
+                if (idMovie > 0)
+                {
+                    characters = characters.Where(x => x.Movies.Any(x => x.Id == idMovie)).ToList();
+                }
+
+                foreach (var x in characters)
+                {
+                    GetFormattedCharacterVM tempCharac = new()
+                    {
+                        Name = x.Name,
+                        Image = x.Image
+                    };
+                    charactersModel.Add(tempCharac);
+                }
+                return Ok(charactersModel);
             }
-            return Ok(charactersModel);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
         public IActionResult Post(PostCharacterVM model)
         {
-            Character NewCharacter = new Character
+            try
             {
-                Image = model.Image,
-                Name = model.Name,
-                Age = model.Age
-                
-            };
-            _characterRepository.Add(NewCharacter);
-            return Ok(NewCharacter);
+                Character NewCharacter = new Character
+                {
+                    Image = model.Image,
+                    Name = model.Name,
+                    Age = model.Age
+
+                };
+                _characterRepository.Add(NewCharacter);
+                return Ok(NewCharacter);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPut]
         public IActionResult Put(PutCharacterVM model)
         {
-            var characterToEdit = _characterRepository.GetCharacter(model.Id);
-
-            if (characterToEdit == null)
+            try
             {
-                return NotFound("El personaje buscado no existe");
-            }
-            else
-            {
-                characterToEdit.Name = model.Name;
-                characterToEdit.Age = model.Age;
+                var characterToEdit = _characterRepository.GetCharacter(model.Id);
                 _characterRepository.Update(characterToEdit);
-                return Ok(characterToEdit);
+
+                if (characterToEdit == null)
+                {
+                    return NotFound("El personaje buscado no existe");
+                }
+                else
+                {
+                    characterToEdit.Name = model.Name;
+                    characterToEdit.Age = model.Age;
+                    _characterRepository.Update(characterToEdit);
+                    return Ok(characterToEdit);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
             }
         }
 
@@ -150,17 +194,25 @@ namespace Alkemy_Challenge.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var characterToEdit = _characterRepository.GetCharacter(id);
-
-            if (characterToEdit == null)
+            try
             {
-                return NotFound("El personaje buscado no existe");
+                var characterToEdit = _characterRepository.GetCharacter(id);
+
+                if (characterToEdit == null)
+                {
+                    return NotFound("El personaje buscado no existe");
+                }
+                else
+                {
+                    _characterRepository.Delete(id);
+
+                    return Ok("Personaje eliminado");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _characterRepository.Delete(id);
-
-                return Ok("Personaje eliminado");
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
             }
         }
     }
