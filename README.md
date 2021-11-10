@@ -2,4 +2,4 @@
 
 
 # Challenge Alkemy - Deguer Ulises Alvaro 
-### Desafio que consiste en desarrollar una API para explorar el mundo de Disney, la cual permitirá conocer y modificar los personajes que lo componen y entender en qué películas estos participaron. Deberá exponer la información para que cualquier frontend pueda consumirla.
+ Desafio que consiste en desarrollar una API para explorar el mundo de Disney, la cual permitirá conocer y modificar los personajes que lo componen y entender en qué películas estos participaron. Deberá exponer la información para que cualquier frontend pueda consumirla.
